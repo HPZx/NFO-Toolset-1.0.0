@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TV Show NFO Builder</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    #generatedNFO {
+      font-family: monospace;
+      white-space: pre-wrap;
+      background-color: #000;
+      color: #00FF00; /* Text color in green */
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">TV Show NFO Builder</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="https://mediaarea.net/MediaInfoOnline" target="_blank">MediaInfoOnline</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+<div class="container mt-3">
+    <a href="index.html" class="btn btn-primary">Back to NFO selection</a>
+	
+  <main class="container mt-5">
+    <form id="nfoForm">
+      <div class="mb-3">
+        <label for="showTitle" class="form-label">TV Show Title:</label>
+        <input type="text" class="form-control" id="showTitle" required value="Better Call Saul">
+      </div>
+
+      <div class="mb-3">
+        <label for="releaseName" class="form-label">Release Name:</label>
+        <input type="text" class="form-control" id="releaseName" required value="Better.Call.Saul.S01E01.720p.HDTV.x264-Merovingian ">
+      </div>
+
+      <div class="mb-3">
+        <label for="season" class="form-label">Season:</label>
+        <input type="number" class="form-control" id="season" required value="1">
+      </div>
+
+      <div class="mb-3">
+        <label for="episode" class="form-label">Episode:</label>
+        <input type="number" class="form-control" id="episode" required value="1">
+      </div>
+
+      <div class="mb-3">
+        <label for="languages" class="form-label">Languages:</label>
+        <input type="text" class="form-control" id="languages" required value="English">
+      </div>
+
+      <div class="mb-3">
+        <label for="fileType" class="form-label">File Type:</label>
+        <input type="text" class="form-control" id="fileType" required value="MKV">
+      </div>
+
+      <div class="mb-3">
+        <label for="Duration" class="form-label">Duration:</label>
+        <input type="text" class="form-control" id="Duration" required value="60 minutes">
+      </div>
+
+      <div class="mb-3">
+        <label for="fileInformation" class="form-label">File Information:</label>
+        <textarea class="form-control" id="fileInformation" rows="10" required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="plot" class="form-label">Plot:</label>
+        <textarea class="form-control" id="plot" rows="5" required>
+          Better Call Saul follows the transformation of Jimmy McGill, a small-time
+          lawyer hustling to champion his underdog clients, build his practice,
+          and somehow make a name for himself, all while treading in the shadow of
+          his successful elder brother Chuck McGill. The series is a prequel to
+          Breaking Bad and the evolution of Jimmy into Saul Goodman, the
+          morally challenged lawyer.
+        </textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="imdbLink" class="form-label">IMDb Link:</label>
+        <input type="text" class="form-control" id="imdbLink" required value="https://www.imdb.com/title/tt3032476/">
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Generate NFO</button>
+      </div>
+    </form>
+
+    <div class="mt-5">
+      <h2 class="text-center">Generated NFO:</h2>
+      <pre id="generatedNFO"></pre>
+
+      <div class="text-center">
+        <button id="saveButton" class="btn btn-success" disabled>Save NFO</button>
+        <button id="saveAsPngButton" class="btn btn-success" disabled>Save as PNG</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    function updateCharacterCounters() {
+      // Function to update character counters for text areas
+      const plotTextarea = document.getElementById("plot");
+      const plotCharactersLeft = 500 - plotTextarea.value.length;
+      document.getElementById("plotCounter").textContent = `Characters left: ${plotCharactersLeft}`;
+
+      // Limit characters per line to 80
+      plotTextarea.value = limitCharactersPerLine(plotTextarea.value, 80);
+    }
+
+    function limitCharactersPerLine(text, limit) {
+      // Function to limit characters per line
+      return text.split('\n').map(line => {
+        let result = '';
+        while (line.length > limit) {
+          result += line.slice(0, limit) + '\n';
+          line = line.slice(limit);
+        }
+        return result + line;
+      }).join('\n');
+    }
+
+    document.getElementById("plot").addEventListener("input", updateCharacterCounters);
+
+    document.getElementById("nfoForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      var showTitle = document.getElementById("showTitle").value;
+      var releaseName = document.getElementById("releaseName").value;
+      var season = document.getElementById("season").value;
+      var episode = document.getElementById("episode").value;
+      var languages = document.getElementById("languages").value;
+      var fileType = document.getElementById("fileType").value;
+      var Duration = document.getElementById("Duration").value;
+      var fileInformation = document.getElementById("fileInformation").value;
+      var plot = document.getElementById("plot").value;
+      var imdbLink = document.getElementById("imdbLink").value;
+      
+      var asciiArt = `
+	  
+    ███▄ ▄███▓▓█████  ██▀███   ▒█████   ██▒   █▓ ██▓ ███▄    █   ▄████  ██▓ ▄▄▄       ███▄    █
+   ▓██▒▀█▀ ██▒▓█   ▀ ▓██ ▒ ██▒▒██▒  ██▒▓██░   █▒▓██▒ ██ ▀█   █  ██▒ ▀█▒▓██▒▒████▄     ██ ▀█   █
+   ▓██    ▓██░▒███   ▓██ ░▄█ ▒▒██░  ██▒ ▓██  █▒░▒██▒▓██  ▀█ ██▒▒██░▄▄▄░▒██▒▒██  ▀█▄  ▓██  ▀█ ██▒
+   ▒██    ▒██ ▒▓█  ▄ ▒██▀▀█▄  ▒██   ██░  ▒██ █░░░██░▓██▒  ▐▌██▒░▓█  ██▓░██░░██▄▄▄▄██ ▓██▒  ▐▌██▒
+   ▒██▒   ░██▒░▒████▒░██▓ ▒██▒░ ████▓▒░   ▒▀█░  ░██░▒██░   ▓██░░▒▓███▀▒░██░ ▓█   ▓██▒▒██░   ▓██░
+   ░ ▒░   ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░░ ▒░▒░▒░    ░ ▐░  ░▓  ░ ▒░   ▒ ▒  ░▒   ▒ ░▓   ▒▒   ▓▒█░░ ▒░   ▒ ▒
+   ░  ░      ░ ░ ░  ░  ░▒ ░ ▒░  ░ ▒ ▒░    ░ ░░   ▒ ░░ ░░   ░ ▒░  ░   ░  ▒ ░  ▒   ▒▒ ░░ ░░   ░ ▒░
+   ░      ░      ░     ░░   ░ ░ ░ ░ ▒       ░░   ▒ ░   ░   ░ ░ ░ ░   ░  ▒ ░  ░   ▒      ░   ░ ░
+          ░      ░  ░   ░         ░ ░        ░   ░           ░       ░  ░        ░  ░         ░
+                                            ░                                                  
+
+████████████████████████████████████████████████████████████████████████████████████████████████████████████
+                                        Proudly present
+                   ${releaseName}     
+████████████████████████████████████████████████████████████████████████████████████████████████████████████
+
+        TV Show Title  : ${showTitle}
+        Release Name   : ${releaseName}
+        Season         : ${season}
+        Episode        : ${episode}
+        Languages      : ${languages}
+        File Type      : ${fileType}
+        Duration       : ${Duration}
+        IMDb Link      : ${imdbLink}
+          
+
+        File Information:
+        ${fileInformation}
+		
+		
+        Plot:
+
+        ${plot}
+		
+		
+		
+
+████████████████████████████████████████████████████████████████████████████████████████████████████████████
+                         GREETINGS TO ALL PIRATES ACROSS THE SEVEN SEAS          
+████████████████████████████████████████████████████████████████████████████████████████████████████████████
+      `;
+
+      document.getElementById("generatedNFO").textContent = asciiArt;
+      document.getElementById("saveButton").disabled = false;
+      document.getElementById("saveAsPngButton").disabled = false;
+    });
+
+    document.getElementById("saveButton").addEventListener("click", function() {
+      var nfoContent = document.getElementById("generatedNFO").textContent;
+      var blob = new Blob([nfoContent], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, "TVShow.nfo");
+    });
+
+    document.getElementById("saveAsPngButton").addEventListener("click", function() {
+      html2canvas(document.getElementById("generatedNFO")).then(function(canvas) {
+        var imgData = canvas.toDataURL('image/png');
+        var blob = dataURLtoBlob(imgData);
+
+        saveAs(blob, "TVShow.png");
+      });
+    });
+
+    function dataURLtoBlob(dataURL) {
+      var parts = dataURL.split(';base64,');
+      var contentType = parts[0].split(':')[1];
+      var raw = window.atob(parts[1]);
+      var rawLength = raw.length;
+      var uInt8Array = new Uint8Array(rawLength);
+
+      for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+
+      return new Blob([uInt8Array], { type: contentType });
+    }
+  </script>
+</body>
+</html>
