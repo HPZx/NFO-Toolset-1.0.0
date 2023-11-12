@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Game NFO Builder</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    #generatedNFO {
+      font-family: monospace;
+      white-space: pre-wrap;
+      background-color: #000;
+      color: #00FF00; /* Text color in green */
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">Game NFO Builder</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  
+  <div class="container mt-3">
+    <a href="index.html" class="btn btn-primary">Back to NFO selection</a>
+
+  <main class="container mt-5">
+    <form id="nfoForm">
+      <div class="mb-3">
+        <label for="gameName" class="form-label">Game Title:</label>
+        <input type="text" class="form-control" id="gameName" required value="The Witcher 3: Wild Hunt">
+      </div>
+
+      <div class="mb-3">
+        <label for="size" class="form-label">File Size:</label>
+        <input type="text" class="form-control" id="size" required value="35.6 GB">
+      </div>
+
+      <div class="mb-3">
+        <label for "releaseName" class="form-label">Release Name:</label>
+        <input type="text" class="form-control" id="releaseName" required value="The Witcher 3 Game of the Year Edition-Merovingian">
+      </div>
+
+      <div class="mb-3">
+        <label for="developer" class="form-label">Developer:</label>
+        <input type="text" class="form-control" id="developer" required value="CD Projekt Red">
+      </div>
+
+      <div class="mb-3">
+        <label for="releaseYear" class="form-label">Release Year:</label>
+        <input type="text" class="form-control" id="releaseYear" required value="2015">
+      </div>
+
+      <div class="mb-3">
+        <label for="languages" class="form-label">Languages:</label>
+        <input type="text" class="form-control" id="languages" required value="English, French, German, Spanish, Italian">
+      </div>
+
+      <div class="mb-3">
+        <label for="fileType" class="form-label">File Type:</label>
+        <input type="text" class="form-control" id="fileType" required value="ISO">
+      </div>
+
+      <div class="mb-3">
+        <label for="protection" class="form-label">Protection:</label>
+        <input type="text" class="form-control" id="protection" required value="DRM-Free">
+      </div>
+
+      <div class="mb-3">
+        <label for="minimumRequirements" class="form-label">Minimum Requirements :</label>
+        <textarea class="form-control" id="minimumRequirements" rows="10" required> - OS: Windows 7/8/10 (64-bit)
+ - Processor: Intel Core i5-2500K 3.3GHz / AMD Phenom II X4 940
+ - Memory: 6 GB RAM
+ - Graphics: Nvidia GeForce GTX 660 / AMD Radeon HD 7870
+ - Storage: 35 GB available space</textarea>
+        <div id="minimumRequirementsCounter" class="form-text text-muted">Characters left: 500</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="notes" class="form-label">Notes :</label>
+        <textarea class="form-control" id="notes" rows="5" required> - This is the Game of the Year Edition, which includes all DLCs and expansions.
+ - Enjoy the epic open-world RPG adventure of Geralt of Rivia.
+ - Please support the developers by purchasing the game if you like it.</textarea>
+        <div id="notesCounter" class="form-text text-muted">Characters left: 500</div>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Generate NFO</button>
+      </div>
+    </form>
+
+    <div class="mt-5">
+      <h2 class="text-center">Generated NFO:</h2>
+      <pre id="generatedNFO"></pre>
+
+      <div class="text-center">
+        <button id="saveButton" class="btn btn-success" disabled>Save NFO</button>
+        <button id="saveAsPngButton" class="btn btn-success" disabled>Save as PNG</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    function updateCharacterCounters() {
+      // Function to update character counters for text areas
+      const minimumRequirementsTextarea = document.getElementById("minimumRequirements");
+      const notesTextarea = document.getElementById("notes");
+      const minimumRequirementsCounter = document.getElementById("minimumRequirementsCounter");
+      const notesCounter = document.getElementById("notesCounter");
+      const maxCharacters = 500; // Maximum characters allowed
+      
+      const minimumRequirementsCharactersLeft = maxCharacters - minimumRequirementsTextarea.value.length;
+      minimumRequirementsCounter.textContent = `Characters left: ${minimumRequirementsCharactersLeft}`;
+      
+      const notesCharactersLeft = maxCharacters - notesTextarea.value.length;
+      notesCounter.textContent = `Characters left: ${notesCharactersLeft}`;
+      
+      // Limit characters per line to 80
+      minimumRequirementsTextarea.value = limitCharactersPerLine(minimumRequirementsTextarea.value, 80);
+      notesTextarea.value = limitCharactersPerLine(notesTextarea.value, 80);
+    }
+
+    function limitCharactersPerLine(text, limit) {
+      // Function to limit characters per line
+      return text.split('\n').map(line => {
+        let result = '';
+        while (line.length > limit) {
+          result += line.slice(0, limit) + '\n';
+          line = line.slice(limit);
+        }
+        return result + line;
+      }).join('\n');
+    }
+
+    document.getElementById("minimumRequirements").addEventListener("input", updateCharacterCounters);
+    document.getElementById("notes").addEventListener("input", updateCharacterCounters);
+
+    document.getElementById("nfoForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      var gameName = document.getElementById("gameName").value;
+      var size = document.getElementById("size").value;
+      var releaseName = document.getElementById("releaseName").value;
+      var developer = document.getElementById("developer").value;
+      var releaseYear = document.getElementById("releaseYear").value;
+      var languages = document.getElementById("languages").value;
+      var fileType = document.getElementById("fileType").value;
+      var protection = document.getElementById("protection").value;
+      var minimumRequirements = document.getElementById("minimumRequirements").value;
+      var notes = document.getElementById("notes").value;
+      
+      var asciiArt = `
+      
+    ███▄ ▄███▓▓█████  ██▀███   ▒█████   ██▒   █▓ ██▓ ███▄    █   ▄████  ██▓ ▄▄▄       ███▄    █ 
+   ▓██▒▀█▀ ██▒▓█   ▀ ▓██ ▒ ██▒▒██▒  ██▒▓██░   █▒▓██▒ ██ ▀█   █  ██▒ ▀█▒▓██▒▒████▄     ██ ▀█   █ 
+   ▓██    ▓██░▒███   ▓██ ░▄█ ▒▒██░  ██▒ ▓██  █▒░▒██▒▓██  ▀█ ██▒▒██░▄▄▄░▒██▒▒██  ▀█▄  ▓██  ▀█ ██▒
+   ▒██    ▒██ ▒▓█  ▄ ▒██▀▀█▄  ▒██   ██░  ▒██ █░░░██░▓██▒  ▐▌██▒░▓█  ██▓░██░░██▄▄▄▄██ ▓██▒  ▐▌██▒
+   ▒██▒   ░██▒░▒████▒░██▓ ▒██▒░ ████▓▒░   ▒▀█░  ░██░▒██░   ▓██░░▒▓███▀▒░██░ ▓█   ▓██▒▒██░   ▓██░
+   ░ ▒░   ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░░ ▒░▒░▒░    ░ ▐░  ░▓  ░ ▒░   ▒ ▒  ░▒   ▒ ░▓   ▒▒   ▓▒█░░ ▒░   ▒ ▒ 
+   ░  ░      ░ ░ ░  ░  ░▒ ░ ▒░  ░ ▒ ▒░    ░ ░░   ▒ ░░ ░░   ░ ▒░  ░   ░  ▒ ░  ▒   ▒▒ ░░ ░░   ░ ▒░
+   ░      ░      ░     ░░   ░ ░ ░ ░ ▒       ░░   ▒ ░   ░   ░ ░ ░ ░   ░  ▒ ░  ░   ▒      ░   ░ ░ 
+          ░      ░  ░   ░         ░ ░        ░   ░           ░       ░  ░        ░  ░         ░ 
+                                            
+                                                
+████████████████████████████████████████████████████████████████████████████████████████████████
+                                            Proudly present
+                          ${releaseName}     
+████████████████████████████████████████████████████████████████████████████████████████████████
+
+        Game Title    : ${gameName}
+        File Size     : ${size}
+        Developer     : ${developer}
+        Release Year  : ${releaseYear}
+        Languages     : ${languages}
+        File Type     : ${fileType}
+        Protection    : ${protection} 
+          
+
+        Minimum Requirements:
+        ${minimumRequirements}
+                
+                
+        Install:
+        
+        1.) Mount
+        2.) Install
+        3.) Play
+       
+       Notes:
+        ${notes}
+        
+        
+
+████████████████████████████████████████████████████████████████████████████████████████████████
+                         GREETINGS TO ALL PIRATES ACROSS THE SEVEN SEAS          
+████████████████████████████████████████████████████████████████████████████████████████████████
+      `;
+
+      document.getElementById("generatedNFO").textContent = asciiArt;
+      document.getElementById("saveButton").disabled = false;
+      document.getElementById("saveAsPngButton").disabled = false;
+    });
+
+    document.getElementById("saveButton").addEventListener("click", function() {
+      var nfoContent = document.getElementById("generatedNFO").textContent;
+      var blob = new Blob([nfoContent], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, "Game.nfo");
+    });
+
+    document.getElementById("saveAsPngButton").addEventListener("click", function() {
+      html2canvas(document.getElementById("generatedNFO")).then(function(canvas) {
+        var imgData = canvas.toDataURL('image/png');
+        var blob = dataURLtoBlob(imgData);
+
+        saveAs(blob, "Game.png");
+      });
+    });
+
+    function dataURLtoBlob(dataURL) {
+      var parts = dataURL.split(';base64,');
+      var contentType = parts[0].split(':')[1];
+      var raw = window.atob(parts[1]);
+      var rawLength = raw.length;
+      var uInt8Array = new Uint8Array(rawLength);
+
+      for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+
+      return new Blob([uInt8Array], { type: contentType });
+    }
+  </script>
+</body>
+</html>

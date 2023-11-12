@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music NFO Builder</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    #generatedNFO {
+      font-family: monospace;
+      white-space: pre-wrap;
+      background-color: #000;
+      color: #00FF00;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">Music NFO Builder</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  
+  <div class="container mt-3">
+    <a href="index.html" class="btn btn-primary">Back to NFO selection</a>
+
+  <main class="container mt-5">
+    <form id="nfoForm">
+      <div class="mb-3">
+        <label for="albumTitle" class="form-label">Album Title:</label>
+        <input type="text" class="form-control" id="albumTitle" required value="My Beautiful Dark Twisted Fantasy">
+      </div>
+
+      <div class="mb-3">
+        <label for="artist" class="form-label">Artist:</label>
+        <input type="text" class="form-control" id="artist" required value="Kanye West">
+      </div>
+
+      <div class="mb-3">
+        <label for="genre" class="form-label">Genre:</label>
+        <input type="text" class="form-control" id="genre" required value="Hip Hop, R&B">
+      </div>
+
+      <div class="mb-3">
+        <label for="releaseYear" class="form-label">Release Year:</label>
+        <input type="text" class="form-control" id="releaseYear" required value="2010">
+      </div>
+
+      <div class="mb-3">
+        <label for="fileFormat" class="form-label">File Format:</label>
+        <input type="text" class="form-control" id="fileFormat" required value="MP3">
+      </div>
+
+      <div class="mb-3">
+        <label for="bitrate" class="form-label">Bitrate:</label>
+        <input type="text" class="form-control" id="bitrate" required value="320 kbps">
+      </div>
+
+      <div class="mb-3">
+        <label for="songList" class="form-label">Song List:</label>
+        <textarea class="form-control" id="songList" rows="5" required>Dark Fantasy
+Gorgeous
+Power
+All of the Lights
+Monster</textarea>
+        <div id="songListCounter" class="form-text text-muted">Songs: 5</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="releaseName" class="form-label">Release Name:</label>
+        <input type="text" class="form-control" id="releaseName" required value="My_Beautiful_Dark_Twisted_Fantasy-Merovingian ">
+      </div>
+
+      <div class="mb-3">
+        <label for="notes" class="form-label">Notes :</label>
+        <textarea class="form-control" id="notes" rows="5" required>NONE.</textarea>
+        <div id="notesCounter" class="form-text text-muted">Characters left: 500</div>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Generate NFO</button>
+      </div>
+    </form>
+
+    <div class="mt-5">
+      <h2 class="text-center">Generated NFO:</h2>
+      <pre id="generatedNFO"></pre>
+
+      <div class="text-center">
+        <button id="saveButton" class="btn btn-success" disabled>Save NFO</button>
+        <button id="saveAsPngButton" class="btn btn-success" disabled>Save as PNG</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    function updateCharacterCounters() {
+      const notesTextarea = document.getElementById("notes");
+      const notesCounter = document.getElementById("notesCounter");
+      const maxCharacters = 500;
+
+      const notesCharactersLeft = maxCharacters - notesTextarea.value.length;
+      notesCounter.textContent = `Characters left: ${notesCharactersLeft}`;
+      
+      notesTextarea.value = limitCharactersPerLine(notesTextarea.value, 80);
+    }
+
+    function updateSongListCounter() {
+      const songListTextarea = document.getElementById("songList");
+      const songListCounter = document.getElementById("songListCounter");
+      const songCount = (songListTextarea.value.match(/\n/g) || []).length + 1;
+      songListCounter.textContent = `Songs: ${songCount}`;
+    }
+
+    function limitCharactersPerLine(text, limit) {
+      return text.split('\n').map(line => {
+        let result = '';
+        while (line.length > limit) {
+          result += line.slice(0, limit) + '\n';
+          line = line.slice(limit);
+        }
+        return result + line;
+      }).join('\n');
+    }
+
+    document.getElementById("notes").addEventListener("input", updateCharacterCounters);
+    document.getElementById("songList").addEventListener("input", updateSongListCounter);
+
+    document.getElementById("nfoForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      var albumTitle = document.getElementById("albumTitle").value;
+      var artist = document.getElementById("artist").value;
+      var genre = document.getElementById("genre").value;
+      var releaseYear = document.getElementById("releaseYear").value;
+      var fileFormat = document.getElementById("fileFormat").value;
+      var bitrate = document.getElementById("bitrate").value;
+      var songList = document.getElementById("songList").value;
+      var releaseName = document.getElementById("releaseName").value;
+      var notes = document.getElementById("notes").value;
+      
+      var asciiArt = `
+      
+   
+    ███▄ ▄███▓▓█████  ██▀███   ▒█████   ██▒   █▓ ██▓ ███▄    █   ▄████  ██▓ ▄▄▄       ███▄    █
+   ▓██▒▀█▀ ██▒▓█   ▀ ▓██ ▒ ██▒▒██▒  ██▒▓██░   █▒▓██▒ ██ ▀█   █  ██▒ ▀█▒▓██▒▒████▄     ██ ▀█   █
+   ▓██    ▓██░▒███   ▓██ ░▄█ ▒▒██░  ██▒ ▓██  █▒░▒██▒▓██  ▀█ ██▒▒██░▄▄▄░▒██▒▒██  ▀█▄  ▓██  ▀█ ██▒
+   ▒██    ▒██ ▒▓█  ▄ ▒██▀▀█▄  ▒██   ██░  ▒██ █░░░██░▓██▒  ▐▌██▒░▓█  ██▓░██░░██▄▄▄▄██ ▓██▒  ▐▌██▒
+   ▒██▒   ░██▒░▒████▒░██▓ ▒██▒░ ████▓▒░   ▒▀█░  ░██░▒██░   ▓██░░▒▓███▀▒░██░ ▓█   ▓██▒▒██░   ▓██░
+   ░ ▒░   ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░░ ▒░▒░▒░    ░ ▐░  ░▓  ░ ▒░   ▒ ▒  ░▒   ▒ ░▓   ▒▒   ▓▒█░░ ▒░   ▒ ▒
+   ░  ░      ░ ░ ░  ░  ░▒ ░ ▒░  ░ ▒ ▒░    ░ ░░   ▒ ░░ ░░   ░ ▒░  ░   ░  ▒ ░  ▒   ▒▒ ░░ ░░   ░ ▒░
+   ░      ░      ░     ░░   ░ ░ ░ ░ ▒       ░░   ▒ ░   ░   ░ ░ ░ ░   ░  ▒ ░  ░   ▒      ░   ░ ░
+          ░      ░  ░   ░         ░ ░        ░   ░           ░       ░  ░        ░  ░         ░
+                                            
+    
+████████████████████████████████████████████████████████████████████████████████████████████████████████
+                                        Proudly present
+                   ${releaseName}     
+████████████████████████████████████████████████████████████████████████████████████████████████████████
+
+
+            Album Title   : ${albumTitle}
+            Artist         : ${artist}
+            Genre          : ${genre}
+            Release Year  : ${releaseYear}
+            File Format    : ${fileFormat}
+            Bitrate        : ${bitrate}
+            
+            Song List:
+            ${songList}
+
+
+
+            Notes:
+            ${notes}
+                    
+████████████████████████████████████████████████████████████████████████████████████████████████
+                         GREETINGS TO ALL PIRATES ACROSS THE SEVEN SEAS          
+████████████████████████████████████████████████████████████████████████████████████████████████
+      `;
+
+      document.getElementById("generatedNFO").textContent = asciiArt;
+      document.getElementById("saveButton").disabled = false;
+      document.getElementById("saveAsPngButton").disabled = false;
+    });
+
+    document.getElementById("saveButton").addEventListener("click", function() {
+      var nfoContent = document.getElementById("generatedNFO").textContent;
+      var blob = new Blob([nfoContent], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, "Music.nfo");
+    });
+
+    document.getElementById("saveAsPngButton").addEventListener("click", function() {
+      html2canvas(document.getElementById("generatedNFO")).then(function(canvas) {
+        var imgData = canvas.toDataURL('image/png');
+        var blob = dataURLtoBlob(imgData);
+
+        saveAs(blob, "Music.png");
+      });
+    });
+
+    function dataURLtoBlob(dataURL) {
+      var parts = dataURL.split(';base64,');
+      var contentType = parts[0].split(':')[1];
+      var raw = window.atob(parts[1]);
+      var rawLength = raw.length;
+      var uInt8Array = new Uint8Array(rawLength);
+
+      for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+
+      return new Blob([uInt8Array], { type: contentType });
+    }
+  </script>
+</body>
+</html>
